@@ -14,7 +14,7 @@ def randomDate(start, end):
 
 def onCallScore(isOncall):
     if isOnCall:
-        return [-0.6, -0.4]
+        return -0.6
     else:
         return 0.2
 
@@ -28,7 +28,6 @@ def timeScore(time):
     return -time * 0.6
 
 def calculateScore(accelerometer, timeInSeconds, distance, isCar, isOnCall):
-    score = 0
     score = onCallScore(isOnCall) + accelerometerScore(accelerometer) + distanceScore(distance) + timeScore(timeInSeconds)
 
     score += 2.1
