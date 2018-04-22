@@ -19,4 +19,4 @@ dbClient.insertWeights({
     'intercept': model.intercept_
 })
 
-# linear_model
+dbClient.updateAvgScoreForUsers()

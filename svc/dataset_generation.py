@@ -44,7 +44,7 @@ def calculateScore(accelerometer, timeInSeconds, distance, isCar, isOnCall):
     return score*100
 
 def generateAttributeValues(startTime, endTime):
-    accelerometer = random.randint(0, 100) / 100
+    accelerometer = random.randint(0, 10) / 10
 
     ### Chances of generating the short trips and long trips should be half and half
     latitude1, longitude1 = random.uniform(32.954039, 33.926300), random.uniform(-97.40845, -90.529583)
@@ -71,7 +71,7 @@ def generateAttributeValues(startTime, endTime):
     return latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp, distance, timeInSeconds, isCar, isOnCall
 
 def generateTrainingData():
-    dataset_size = 1000
+    dataset_size = 500
     for i in range(dataset_size):
         latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp, \
         distance, timeInSeconds, isCar, isOnCall = generateAttributeValues("01-01-2013 00:00", "31-12-2013 11:59")
@@ -84,10 +84,12 @@ def insertTestData():
     for userId in userIds:
         for i in range(10):
             latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp, \
-            distance, timeInSeconds, isCar, isOnCall = generateAttributeValues("01-01-2014 00:00", "31-01-2014 11:59")
+            distance, timeInSeconds, isCar, isOnCall = generateAttributeValues("01-03-2018 00:00", "15-04-2018 11:59")
 
-            dbClient.insertEntry(userId, latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp,
+            dbClient.insertFeature(userId, latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp,
                                  distance, timeInSeconds, isCar, isOnCall)
+
+
 
 # generateTrainingData()
 insertTestData()
