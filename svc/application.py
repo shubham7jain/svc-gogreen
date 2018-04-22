@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import cross_origin, CORS
 import os
 import sys
-from dbClient import DBClient
+from svc.dbClient import DBClient
 import json
 from flask import jsonify
 
@@ -17,16 +17,41 @@ def getScores():
     features = dbClient.getFeatures(userId)
     weights = dbClient.getWeights()
 
-    result = []
     result = {}
     for feature in features:
         score = 0
         for weight in weights:
             featureName = weight['feature']
-            score += feature[featureName] * weight['weight']
+            if featureName == 'intercept':
+                score += weight['weight']
+            else:
+                score += feature[featureName] * weight['weight']
         weights.rewind()
 
         result[str(feature['timestamp'])] = score
+
+    return jsonify(result)
+
+@app.route('/getDistribution', methods = ['GET'])
+def getAverageScoreDistribution():
+    averageScores = dbClient.getAverageScoresAll()
+    result = {}
+    count = {}
+    for userScoreAge in averageScores:
+        age = userScoreAge['age']
+        if age >= 18 and age <= 30:
+            result['18-30'] = result.get('18-30', 0) + userScoreAge['score']
+            count['18-30'] = count.get('18-30', 0) + 1
+        elif age >= 31 and age <= 40:
+            result['31-40'] = result.get('31-40', 0) + userScoreAge['score']
+            count['31-40'] = count.get('31-40', 0) + 1
+        elif age >= 41:
+            result['41-'] = result.get('41-', 0) + userScoreAge['score']
+            count['41-'] = count.get('41-', 0) + 1
+
+    for k, v in result.items():
+        if count[k] != 0:
+            result[k] = result[k]/count[k]
 
     return jsonify(result)
 
