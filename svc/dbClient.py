@@ -41,6 +41,9 @@ class DBClient:
             'isOnCall': isOnCall
         })
 
+    def updateAgeForUsers(self, userId, age):
+        self.userAverageScores.update({"user_id": userId}, {"$set": {"age": age}}, True)
+
     def updateAvgScoreForUsers(self):
         userScoresMap = {}
         features = self.userFeatures.find()

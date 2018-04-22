@@ -62,8 +62,8 @@ def generateAttributeValues(startTime, endTime):
     distance = random.uniform(approxDistance - approxDistance / 5, approxDistance + approxDistance / 5)
 
     ## Normalizing everything from 0 to 1
-    distance = distance / (1000000)
-    timeInSeconds = ((endTimestamp - startTimestamp).seconds) / (timedelta(hours=10).seconds)
+    distance = distance / (900000)
+    timeInSeconds = ((endTimestamp - startTimestamp).seconds) / (timedelta(hours=9).seconds)
 
     isCar = random.randint(0, 1)
     isOnCall = random.randint(0, 1)
@@ -71,7 +71,7 @@ def generateAttributeValues(startTime, endTime):
     return latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp, distance, timeInSeconds, isCar, isOnCall
 
 def generateTrainingData():
-    dataset_size = 500
+    dataset_size = 1000
     for i in range(dataset_size):
         latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp, \
         distance, timeInSeconds, isCar, isOnCall = generateAttributeValues("01-01-2013 00:00", "31-12-2013 11:59")
@@ -80,11 +80,19 @@ def generateTrainingData():
         print(accelerometer,',',timeInSeconds,',',distance,',',isCar,',',isOnCall,',',score)
 
 def insertTestData():
-    userIds = ['1234', '4567', '7890']
-    for userId in userIds:
+    userIdAgeMap = {'1234': 90,
+               '2345': 64,
+               '3456': 80,
+               '4567': 37,
+               '5678': 18,
+               '6789': 33,
+               '7890': 64
+               }
+    for userId, age in userIdAgeMap.items():
+        dbClient.updateAgeForUsers(userId, age)
         for i in range(10):
             latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp, \
-            distance, timeInSeconds, isCar, isOnCall = generateAttributeValues("01-03-2018 00:00", "15-04-2018 11:59")
+            distance, timeInSeconds, isCar, isOnCall = generateAttributeValues("01-03-2018 00:00", "18-04-2018 11:59")
 
             dbClient.insertFeature(userId, latitude1, longitude1, latitude2, longitude2, accelerometer, startTimestamp, endTimestamp,
                                  distance, timeInSeconds, isCar, isOnCall)

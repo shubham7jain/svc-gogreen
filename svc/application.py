@@ -145,12 +145,12 @@ def getFactors():
         onCall += feature['isOnCall']
         if isBetterPathExists('bicycling', feature['sourceLatitude'], feature['sourceLongitude'],
                                       feature['destinationLatitude'], feature['destinationLongitude'],
-                                      feature['distance'] * 1000000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+                                      feature['distance'] * 900000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
             numBikes += 1
 
         if isBetterPathExists('transit', feature['sourceLatitude'], feature['sourceLongitude'],
                               feature['destinationLatitude'], feature['destinationLongitude'],
-                              feature['distance'] * 1000000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+                              feature['distance'] * 900000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
             publicTransport += 1
 
     return jsonify({
