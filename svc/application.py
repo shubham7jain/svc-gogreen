@@ -44,12 +44,9 @@ def isBetterPathExists(mode, sourceLatitude, sourceLongitude,
     distanceBicycle = matrix["rows"][0]["elements"][0]["distance"]["value"]
 
     # 5min
-    if timeBicycle - time < 300:
-        return True
-
-    #1 km
-    if distance - distanceBicycle < 1000:
-        return True
+    if timeBicycle - time < 1800:
+        if distance - distanceBicycle < 1000:
+            return True
 
     return False
 
@@ -145,12 +142,12 @@ def getFactors():
         onCall += feature['isOnCall']
         if isBetterPathExists('bicycling', feature['sourceLatitude'], feature['sourceLongitude'],
                                       feature['destinationLatitude'], feature['destinationLongitude'],
-                                      feature['distance'] * 900000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+                                      feature['distance'] * 900000, feature['timeInSeconds'] * (timedelta(hours=9).seconds)):
             numBikes += 1
 
         if isBetterPathExists('transit', feature['sourceLatitude'], feature['sourceLongitude'],
                               feature['destinationLatitude'], feature['destinationLongitude'],
-                              feature['distance'] * 900000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+                              feature['distance'] * 900000, feature['timeInSeconds'] * (timedelta(hours=9).seconds)):
             publicTransport += 1
 
     return jsonify({
@@ -188,7 +185,7 @@ def getBikeTransitRoutes():
         if isBetterPathExists('transit', feature['sourceLatitude'], feature['sourceLongitude'],
                               feature['destinationLatitude'], feature['destinationLongitude'],
                               feature['distance'] * 1000000,
-                              feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+                              feature['timeInSeconds'] * (timedelta(hours=9).seconds)):
             if 'transit' not in result:
                 result['transit'] = []
             result['transit'].append({
@@ -199,6 +196,8 @@ def getBikeTransitRoutes():
                 "sourceName": gmaps.reverse_geocode((feature['sourceLatitude'], feature['sourceLongitude']))[0]["formatted_address"],
                 "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"]
             })
+
+        result["carTime"] = int(feature['timeInSeconds'] * (timedelta(hours=9).seconds)/60)
 
     return jsonify(result)
 
