@@ -179,7 +179,8 @@ def getBikeTransitRoutes():
                 "destinationLat": feature['destinationLatitude'],
                 "destinationLon": feature['destinationLongitude'],
                 "sourceName": gmaps.reverse_geocode((feature['sourceLatitude'], feature['sourceLongitude']))[0]["formatted_address"],
-                "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"]
+                "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"],
+                "carTime": int(feature['timeInSeconds'] * (timedelta(hours=9).seconds)/60)
             })
 
         if isBetterPathExists('transit', feature['sourceLatitude'], feature['sourceLongitude'],
@@ -194,10 +195,9 @@ def getBikeTransitRoutes():
                 "destinationLat": feature['destinationLatitude'],
                 "destinationLon": feature['destinationLongitude'],
                 "sourceName": gmaps.reverse_geocode((feature['sourceLatitude'], feature['sourceLongitude']))[0]["formatted_address"],
-                "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"]
+                "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"],
+                "carTime": int(feature['timeInSeconds'] * (timedelta(hours=9).seconds)/60)
             })
-
-        result["carTime"] = int(feature['timeInSeconds'] * (timedelta(hours=9).seconds)/60)
 
     return jsonify(result)
 
