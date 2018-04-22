@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import cross_origin, CORS
 import os
-import sys
-from svc.dbClient import DBClient
+from dbClient import DBClient
 import json
 from flask import jsonify
 from datetime import datetime, timedelta
@@ -11,7 +10,7 @@ import googlemaps
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 dbClient = DBClient()
-gmaps = googlemaps.Client(key='AIzaSyBAlFTCNMaNX2E2eW2Rt1C-OBFe_LEqCHE')
+gmaps = googlemaps.Client(key='AIzaSyBfn8jQ8prjOk8V4d68qoe85C3l4hKJeXQ')
 
 def getUserScoreWithTimestamp(userId):
     features = dbClient.getFeatures(userId)
@@ -82,7 +81,7 @@ def getGreenScore():
     if countPrevious != 0:
         previousScore = totalPreviousScore/countPrevious
 
-    return jsonify({ "score": score, "previousScore": previousScore })
+    return jsonify({ "score": int(score), "previousScore": int(previousScore) })
 
 @app.route('/getScores', methods = ['GET'])
 def getScores():
@@ -92,8 +91,9 @@ def getScores():
     result = getUserScoreWithTimestamp(userId)
 
     mainResult = {}
-    for timestamp, score in result.keys():
-        mainResult[str(timestamp)] = score
+    for timestamp, score in result.items():
+        if (datetime.now() - timestamp).days <= 31:
+            mainResult[str(timestamp)] = score
 
     return jsonify(mainResult)
 
@@ -122,7 +122,7 @@ def getAverageScoreDistribution():
 
     for k, v in result.items():
         if count[k] != 0:
-            result[k] = result[k]/count[k]
+            result[k] = int(result[k]/count[k])
 
     return jsonify(result)
 
@@ -160,6 +160,47 @@ def getFactors():
         'publicTransport': publicTransport
     })
 
+@app.route('/api/biketransitRoutes', methods = ['GET'])
+def getBikeTransitRoutes():
+    if request.method == 'GET':
+        userId = request.args['userId']
+
+    result = {}
+    features = dbClient.getFeatures(userId)
+    for feature in features:
+        if (datetime.now() - feature['timestamp']).days >= 31:
+            continue
+
+        if isBetterPathExists('bicycling', feature['sourceLatitude'], feature['sourceLongitude'],
+                              feature['destinationLatitude'], feature['destinationLongitude'],
+                              feature['distance'] * 1000000, feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+            if 'bicycling' not in result:
+                result['bicycling'] = []
+            result['bicycling'].append({
+                "sourceLat": feature['sourceLatitude'],
+                "sourceLon": feature['sourceLongitude'],
+                "destinationLat": feature['destinationLatitude'],
+                "destinationLon": feature['destinationLongitude'],
+                "sourceName": gmaps.reverse_geocode((feature['sourceLatitude'], feature['sourceLongitude']))[0]["formatted_address"],
+                "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"]
+            })
+
+        if isBetterPathExists('transit', feature['sourceLatitude'], feature['sourceLongitude'],
+                              feature['destinationLatitude'], feature['destinationLongitude'],
+                              feature['distance'] * 1000000,
+                              feature['timeInSeconds'] * (timedelta(hours=10).seconds)):
+            if 'transit' not in result:
+                result['transit'] = []
+            result['transit'].append({
+                "sourceLat": feature['sourceLatitude'],
+                "sourceLon": feature['sourceLongitude'],
+                "destinationLat": feature['destinationLatitude'],
+                "destinationLon": feature['destinationLongitude'],
+                "sourceName": gmaps.reverse_geocode((feature['sourceLatitude'], feature['sourceLongitude']))[0]["formatted_address"],
+                "destinationName": gmaps.reverse_geocode((feature['destinationLatitude'], feature['destinationLongitude']))[0]["formatted_address"]
+            })
+
+    return jsonify(result)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3034))

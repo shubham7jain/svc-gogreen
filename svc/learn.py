@@ -1,6 +1,6 @@
 from sklearn.linear_model import LinearRegression
 import pandas as pd
-from svc.dbClient import DBClient
+from dbClient import DBClient
 
 dbClient = DBClient()
 df = pd.read_csv('train.txt')

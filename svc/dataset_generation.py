@@ -2,10 +2,10 @@ import random
 from datetime import datetime, timedelta
 import time
 import googlemaps
-from svc.dbClient import DBClient
+from dbClient import DBClient
 
 dbClient = DBClient()
-gmaps = googlemaps.Client(key='AIzaSyBAlFTCNMaNX2E2eW2Rt1C-OBFe_LEqCHE')
+gmaps = googlemaps.Client(key='AIzaSyBfn8jQ8prjOk8V4d68qoe85C3l4hKJeXQ')
 def randomDate(start, end):
     frmt = '%d-%m-%Y %H:%M'
 

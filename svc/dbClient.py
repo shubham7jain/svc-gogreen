@@ -1,4 +1,4 @@
-from svc.mongo_connect import connectMongo
+from mongo_connect import connectMongo
 from datetime import datetime
 
 class DBClient:
